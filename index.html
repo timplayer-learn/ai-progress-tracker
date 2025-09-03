@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Engineering Progress Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .overall-progress {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .overall-progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .overall-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .phase {
+            margin-bottom: 40px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .phase-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .phase-progress {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 5px 15px;
+            font-weight: bold;
+        }
+
+        .phase-content {
+            padding: 20px;
+        }
+
+        .topic {
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .topic-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .topic-timeline {
+            background: #ecf0f1;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .subtopic {
+            margin: 10px 0;
+        }
+
+        .subtopic label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .subtopic label:hover {
+            background: #f8f9fa;
+        }
+
+        .subtopic input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .subtopic input[type="checkbox"]:checked + span {
+            text-decoration: line-through;
+            color: #27ae60;
+        }
+
+        .project-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .project-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .project-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .project-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-planned {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-in-progress {
+            background: #3498db;
+            color: white;
+        }
+
+        .status-completed {
+            background: #27ae60;
+            color: white;
+        }
+
+        .resource-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-category {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .resource-category h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .resource-link {
+            display: block;
+            color: #3498db;
+            text-decoration: none;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            transition: color 0.3s;
+        }
+
+        .resource-link:hover {
+            color: #2980b9;
+        }
+
+        .notes-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .export-btn:hover {
+            background: #219a52;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .progress-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .phase-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Engineering Progress Tracker</h1>
+            <p>Your journey to becoming an AI Engineer - Track every step of the way</p>
+        </div>
+
+        <div class="overall-progress">
+            <div class="progress-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="completedTopics">0</div>
+                    <div class="stat-label">Topics Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalProjects">0</div>
+                    <div class="stat-label">Projects Built</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="daysStudied">0</div>
+                    <div class="stat-label">Days Studied</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="overallProgress">0%</div>
+                    <div class="stat-label">Overall Progress</div>
+                </div>
+            </div>
+            <div class="overall-progress-bar">
+                <div class="overall-progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('roadmap')">📚 Learning Roadmap</button>
+            <button class="nav-tab" onclick="showTab('projects')">🛠️ Projects</button>
+            <button class="nav-tab" onclick="showTab('resources')">📖 Resources</button>
+            <button class="nav-tab" onclick="showTab('notes')">📝 Notes</button>
+        </div>
+
+        <div id="roadmap" class="tab-content active">
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-title">Phase 1: Foundation Building (Months 1-3)</div>
+                    <div class="phase-progress" id="phase1Progress">0/3 completed</div>
+                </div>
+                <div class="phase-content">
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">1. Python & Core Libraries</div>
+                            <div class="topic-timeline">2-4 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Python fundamentals (CS50's Python Course)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>NumPy for numerical computing</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Pandas for data manipulation</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Matplotlib & Seaborn for visualization</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Scikit-learn basics</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Jupyter Notebooks & Google Colab</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Git & GitHub fundamentals</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">2. Mathematics Foundation</div>
+                            <div class="topic-timeline">4-6 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Linear Algebra (matrices, eigenvalues, SVD)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Probability & Statistics</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Calculus (derivatives, gradients)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Information Theory</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Optimization Theory</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">3. Machine Learning Fundamentals</div>
+                            <div class="topic-timeline">6-8 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Supervised vs Unsupervised Learning</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Model evaluation & bias-variance tradeoff</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Feature engineering</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Ensemble Methods (Random Forests, XGBoost)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Hyperparameter Optimization</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Cross-validation Strategies</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Model Interpretability (SHAP, LIME)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-title">Phase 2: Deep Learning & Modern AI (Months 4-6)</div>
+                    <div class="phase-progress" id="phase2Progress">0/3 completed</div>
+                </div>
+                <div class="phase-content">
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">4. Deep Learning Fundamentals</div>
+                            <div class="topic-timeline">4-6 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Neural Networks from scratch</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>TensorFlow/PyTorch fundamentals</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>CNN architectures</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>RNN, LSTM architectures</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Transfer Learning</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">5. Large Language Models & Transformers</div>
+                            <div class="topic-timeline">3-4 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Transformer architecture deep dive</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>BERT, GPT family understanding</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Prompt engineering techniques</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Fine-tuning strategies (LoRA, QLoRA)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>RAG (Retrieval Augmented Generation)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Vector databases (Pinecone, Weaviate)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">6. Computer Vision Advanced</div>
+                            <div class="topic-timeline">2-3 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Object detection (YOLO, R-CNN)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Semantic segmentation</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Generative models (GANs, VAEs, Diffusion)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>OpenCV practical applications</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-title">Phase 3: Production & Specialization (Months 7-9)</div>
+                    <div class="phase-progress" id="phase3Progress">0/3 completed</div>
+                </div>
+                <div class="phase-content">
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">7. MLOps & Production Systems</div>
+                            <div class="topic-timeline">4-6 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Docker containers for ML</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Model serving (FastAPI, Flask)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Monitoring & Logging (MLflow, W&B)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>CI/CD for ML</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Data versioning (DVC)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>A/B Testing for ML</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">8. Cloud Platforms & Infrastructure</div>
+                            <div class="topic-timeline">3-4 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>AWS ML Services (SageMaker, Bedrock)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Google Cloud ML (Vertex AI)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Azure ML Studio</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Model optimization (quantization, pruning)</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Distributed training</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">9. Choose Specialization</div>
+                            <div class="topic-timeline">Ongoing</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>NLP: Question Answering systems</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Computer Vision: Real-time processing</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Recommendation Systems</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Time Series & Forecasting</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-title">Phase 4: Advanced Topics & Job Preparation (Months 10-12)</div>
+                    <div class="phase-progress" id="phase4Progress">0/3 completed</div>
+                </div>
+                <div class="phase-content">
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">10. AI Agents & Advanced Systems</div>
+                            <div class="topic-timeline">3-4 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Multi-agent systems</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>LangChain/LangGraph workflows</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Tool-using AI systems</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Autonomous agents</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">11. Research & Innovation</div>
+                            <div class="topic-timeline">Ongoing</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Reading research papers</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Open-source contributions</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Kaggle competitions</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="topic">
+                        <div class="topic-header">
+                            <div class="topic-title">12. Interview Preparation</div>
+                            <div class="topic-timeline">6-8 weeks</div>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Data structures & algorithms</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>System design basics</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>ML domain knowledge Q&A</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>AI system design</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Portfolio refinement</span>
+                            </label>
+                        </div>
+                        <div class="subtopic">
+                            <label>
+                                <input type="checkbox" onchange="updateProgress()">
+                                <span>Mock interviews</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="projects" class="tab-content">
+            <div class="project-form">
+                <h2>Add New Project</h2>
+                <div class="form-group">
+                    <label>Project Title:</label>
+                    <input type="text" id="projectTitle" placeholder="e.g., Sentiment Analysis App">
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="projectDescription" placeholder="Describe your project, technologies used, and key features..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="projectStatus">
+                        <option value="planned">Planned</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>GitHub URL (optional):</label>
+                    <input type="url" id="projectGithub" placeholder="https://github.com/username/project">
+                </div>
+                <div class="form-group">
+                    <label>Demo URL (optional):</label>
+                    <input type="url" id="projectDemo" placeholder="https://your-demo-site.com">
+                </div>
+                <button class="btn" onclick="addProject()">Add Project</button>
+            </div>
+
+            <div id="projectsList">
+                <!-- Projects will be added here dynamically -->
+            </div>
+        </div>
+
+        <div id="resources" class="tab-content">
+            <div class="resource-links">
+                <div class="resource-category">
+                    <h3>🐍 Python & Core Libraries</h3>
+                    <a href="https://cs50.harvard.edu/python/2022/" class="resource-link" target="_blank">CS50's Python Course</a>
+                    <a href="https://www.edx.org/learn/artificial-intelligence/harvard-university-cs50-s-introduction-to-artificial-intelligence-with-python" class="resource-link" target="_blank">CS50's AI with Python</a>
+                    <a href="https://numpy.org/devdocs/user/quickstart.html" class="resource-link" target="_blank">NumPy Quickstart</a>
+                    <a href="https://www.w3schools.com/python/pandas/default.asp" class="resource-link" target="_blank">Pandas Tutorial</a>
+                    <a href="https://matplotlib.org/stable/tutorials/index.html" class="resource-link" target="_blank">Matplotlib Tutorials</a>
+                    <a href="https://scikit-learn.org/1.4/tutorial/index.html" class="resource-link" target="_blank">Scikit-learn Tutorial</a>
+                    <a href="https://github.com/jakevdp/PythonDataScienceHandbook" class="resource-link" target="_blank">Python Data Science Handbook</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>📐 Mathematics Foundation</h3>
+                    <a href="https://www.youtube.com/watch?v=fNk_zzaMoSs" class="resource-link" target="_blank">3Blue1Brown - Essence of Linear Algebra</a>
+                    <a href="https://www.edx.org/learn/linear-algebra/the-university-of-texas-at-austin-linear-algebra-foundations-to-frontiers" class="resource-link" target="_blank">Linear Algebra - UT Austin</a>
+                    <a href="https://www.edx.org/learn/probability/harvard-university-introduction-to-probability" class="resource-link" target="_blank">Introduction to Probability - Harvard</a>
+                    <a href="https://www.khanacademy.org/math/multivariable-calculus" class="resource-link" target="_blank">Khan Academy - Multivariable Calculus</a>
+                    <a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/" class="resource-link" target="_blank">MIT - Introduction to Probability</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🤖 Machine Learning Fundamentals</h3>
+                    <a href="https://www.coursera.org/learn/machine-learning" class="resource-link" target="_blank">Machine Learning by Andrew Ng</a>
+                    <a href="https://developers.google.com/machine-learning/crash-course" class="resource-link" target="_blank">Google ML Crash Course</a>
+                    <a href="http://ema.cri-info.cm/wp-content/uploads/2019/07/2019BurkovTheHundred-pageMachineLearning.pdf" class="resource-link" target="_blank">The Hundred-Page ML Book (PDF)</a>
+                    <a href="https://github.com/armankhondker/awesome-ai-ml-resources" class="resource-link" target="_blank">Awesome AI/ML Resources</a>
+                    <a href="https://madewithml.com/" class="resource-link" target="_blank">Made with ML</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🧠 Deep Learning & Modern AI</h3>
+                    <a href="https://course.fast.ai/" class="resource-link" target="_blank">Fast.ai - Practical Deep Learning</a>
+                    <a href="https://www.coursera.org/specializations/deep-learning" class="resource-link" target="_blank">Deep Learning Specialization</a>
+                    <a href="https://www.youtube.com/watch?v=vT1JzLTH4G4&list=PLSVEhWrZWDHQTBmWZufjxpw3s8sveJtnJ&index=1" class="resource-link" target="_blank">CS231n - CNN for Visual Recognition</a>
+                    <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/" class="resource-link" target="_blank">Hands-On ML with Scikit-Learn & TensorFlow</a>
+                    <a href="https://www.youtube.com/watch?v=kCc8FmEb1nY&t=1331s" class="resource-link" target="_blank">Build Your Own GPT</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🔧 MLOps & Production</h3>
+                    <a href="https://ml-ops.org/" class="resource-link" target="_blank">Intro to MLOps</a>
+                    <a href="https://ml-ops.org/content/three-levels-of-ml-software" class="resource-link" target="_blank">Three Levels of ML Software</a>
+                    <a href="https://fullstackdeeplearning.com/course/2022/" class="resource-link" target="_blank">Full Stack Deep Learning</a>
+                    <a href="https://mlflow.org/docs/latest/tutorials-and-examples/" class="resource-link" target="_blank">MLflow Tutorials</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🎯 Specialized Areas</h3>
+                    <a href="https://huggingface.co/learn/nlp-course/chapter1/1" class="resource-link" target="_blank">Hugging Face NLP Course</a>
+                    <a href="https://www.youtube.com/watch?v=rmVRLeJRkl4&list=PLoROMvodv4rMFqRtEuo6SGjY4XbRIVRd4&index=1" class="resource-link" target="_blank">Stanford CS224n - NLP with Deep Learning</a>
+                    <a href="https://www.kaggle.com/learn/computer-vision" class="resource-link" target="_blank">Kaggle - Computer Vision</a>
+                    <a href="https://huggingface.co/learn/deep-rl-course/unit0/introduction" class="resource-link" target="_blank">Hugging Face Deep RL Course</a>
+                    <a href="https://www.youtube.com/watch?v=2pWv7GOvuf0&list=PLqYmG7hTraZDM-OYHWgPebj2MfCFzFObQ" class="resource-link" target="_blank">Reinforcement Learning Course (David Silver)</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🎓 Interview Preparation</h3>
+                    <a href="https://neetcode.io/roadmap" class="resource-link" target="_blank">NeetCode.io - Coding Interview</a>
+                    <a href="https://interviewing.io/" class="resource-link" target="_blank">Interviewing.io - Mock Interviews</a>
+                    <a href="https://www.educative.io/courses/grokking-the-system-design-interview" class="resource-link" target="_blank">Grokking System Design</a>
+                    <a href="https://huyenchip.com/ml-interviews-book/" class="resource-link" target="_blank">ML Interviews Book</a>
+                    <a href="https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/" class="resource-link" target="_blank">Designing ML Systems</a>
+                    <a href="https://www.coursera.org/learn/machine-learning-projects" class="resource-link" target="_blank">Structured ML Projects</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>📚 Essential Research Papers</h3>
+                    <a href="https://arxiv.org/pdf/1706.03762" class="resource-link" target="_blank">Attention Is All You Need (Transformers)</a>
+                    <a href="https://arxiv.org/pdf/2501.12948" class="resource-link" target="_blank">DeepSeek R1: Incentivizing Reasoning</a>
+                    <a href="https://arxiv.org/pdf/2209.07663" class="resource-link" target="_blank">Monolith: TikTok's Recommendation System</a>
+                    <a href="https://arxiv.org/pdf/1810.04805" class="resource-link" target="_blank">BERT: Bidirectional Transformers</a>
+                    <a href="https://arxiv.org/pdf/1503.02531" class="resource-link" target="_blank">Distilling Knowledge in Neural Networks</a>
+                    <a href="https://arxiv.org/" class="resource-link" target="_blank">ArXiv (Latest AI Research)</a>
+                    <a href="https://spinningup.openai.com/en/latest/spinningup/keypapers.html" class="resource-link" target="_blank">OpenAI Key Papers in Deep RL</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🏆 Practice & Competitions</h3>
+                    <a href="https://www.kaggle.com/learn" class="resource-link" target="_blank">Kaggle Learn</a>
+                    <a href="https://leetcode.com/problemset/all/" class="resource-link" target="_blank">LeetCode Problems</a>
+                    <a href="https://paperswithcode.com/" class="resource-link" target="_blank">Papers with Code</a>
+                    <a href="https://www.kaggle.com/competitions" class="resource-link" target="_blank">Kaggle Competitions</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>🌐 Communities & Networking</h3>
+                    <a href="https://www.reddit.com/r/MachineLearning/" class="resource-link" target="_blank">r/MachineLearning</a>
+                    <a href="https://discord.gg/machinelearning" class="resource-link" target="_blank">ML Discord Community</a>
+                    <a href="https://www.meetup.com/topics/machine-learning/" class="resource-link" target="_blank">ML Meetups</a>
+                    <a href="https://twitter.com/i/lists/1273973067855855616" class="resource-link" target="_blank">AI/ML Twitter List</a>
+                    <a href="https://neurips.cc/" class="resource-link" target="_blank">NeurIPS Conference</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>☁️ Cloud Platforms & Tools</h3>
+                    <a href="https://aws.amazon.com/sagemaker/" class="resource-link" target="_blank">AWS SageMaker</a>
+                    <a href="https://cloud.google.com/vertex-ai" class="resource-link" target="_blank">Google Vertex AI</a>
+                    <a href="https://azure.microsoft.com/en-us/services/machine-learning/" class="resource-link" target="_blank">Azure ML</a>
+                    <a href="https://colab.research.google.com/" class="resource-link" target="_blank">Google Colab</a>
+                    <a href="https://pytorch.org/tutorials/" class="resource-link" target="_blank">PyTorch Tutorials</a>
+                    <a href="https://www.tensorflow.org/learn" class="resource-link" target="_blank">TensorFlow Learn</a>
+                </div>
+
+                <div class="resource-category">
+                    <h3>📱 Original Roadmap</h3>
+                    <a href="https://share.google/Tr1EqkC9lTK9lF3uo" class="resource-link" target="_blank">🔗 Arman Khondker's Original Roadmap</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="notes" class="tab-content">
+            <div class="notes-section">
+                <h2>📝 Learning Notes & Reflections</h2>
+                <textarea id="learningNotes" placeholder="Keep track of your learning journey, insights, challenges, and breakthroughs...
+
+Some ideas to write about:
+- What concepts are you struggling with?
+- What projects are you most excited about?
+- Key insights from courses or books
+- Interview experiences and feedback
+- Networking contacts and opportunities
+- Technical concepts that clicked for you
+- Areas where you need more practice
+
+Remember: This is your personal learning journal!"></textarea>
+                <br><br>
+                <button class="btn" onclick="saveNotes()">Save Notes</button>
+                <button class="export-btn" onclick="exportProgress()">Export Progress Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data structure
+        let progressData = {
+            startDate: new Date().toISOString().split('T')[0],
+            topics: {},
+            projects: [],
+            notes: '',
+            studyDays: new Set()
+        };
+
+        // Load saved progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('aiProgressTracker');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                progressData = {
+                    ...progressData,
+                    ...parsed,
+                    studyDays: new Set(parsed.studyDays || [])
+                };
+                
+                // Restore checkbox states
+                document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                    if (progressData.topics[index]) {
+                        checkbox.checked = true;
+                    }
+                });
+                
+                // Restore notes
+                if (progressData.notes) {
+                    document.getElementById('learningNotes').value = progressData.notes;
+                }
+                
+                // Restore projects
+                progressData.projects.forEach(project => {
+                    addProjectToDOM(project);
+                });
+                
+                updateProgress();
+            }
+        }
+
+        // Save progress to localStorage
+        function saveProgress() {
+            const dataToSave = {
+                ...progressData,
+                studyDays: Array.from(progressData.studyDays)
+            };
+            localStorage.setItem('aiProgressTracker', JSON.stringify(dataToSave));
+        }
+
+        // Update progress statistics
+        function updateProgress() {
+            // Mark today as a study day
+            const today = new Date().toISOString().split('T')[0];
+            progressData.studyDays.add(today);
+            
+            // Count completed topics
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            let completedCount = 0;
+            
+            checkboxes.forEach((checkbox, index) => {
+                progressData.topics[index] = checkbox.checked;
+                if (checkbox.checked) {
+                    completedCount++;
+                }
+            });
+            
+            const totalTopics = checkboxes.length;
+            const progressPercentage = Math.round((completedCount / totalTopics) * 100);
+            
+            // Update statistics
+            document.getElementById('completedTopics').textContent = `${completedCount}/${totalTopics}`;
+            document.getElementById('totalProjects').textContent = progressData.projects.length;
+            document.getElementById('daysStudied').textContent = progressData.studyDays.size;
+            document.getElementById('overallProgress').textContent = `${progressPercentage}%`;
+            
+            // Update progress bar
+            document.getElementById('progressFill').style.width = `${progressPercentage}%`;
+            
+            // Update phase progress
+            updatePhaseProgress();
+            
+            // Save progress
+            saveProgress();
+        }
+
+        // Update phase-specific progress
+        function updatePhaseProgress() {
+            const phases = [
+                { id: 'phase1Progress', start: 0, end: 21 },
+                { id: 'phase2Progress', start: 21, end: 36 },
+                { id: 'phase3Progress', start: 36, end: 51 },
+                { id: 'phase4Progress', start: 51, end: 66 }
+            ];
+            
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            
+            phases.forEach(phase => {
+                let completed = 0;
+                let total = 0;
+                
+                for (let i = phase.start; i < Math.min(phase.end, checkboxes.length); i++) {
+                    total++;
+                    if (checkboxes[i] && checkboxes[i].checked) {
+                        completed++;
+                    }
+                }
+                
+                const phaseElement = document.getElementById(phase.id);
+                if (phaseElement) {
+                    phaseElement.textContent = `${completed}/${total} completed`;
+                }
+            });
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+        }
+
+        // Project management
+        function addProject() {
+            const title = document.getElementById('projectTitle').value;
+            const description = document.getElementById('projectDescription').value;
+            const status = document.getElementById('projectStatus').value;
+            const github = document.getElementById('projectGithub').value;
+            const demo = document.getElementById('projectDemo').value;
+            
+            if (!title.trim()) {
+                alert('Please enter a project title');
+                return;
+            }
+            
+            const project = {
+                id: Date.now(),
+                title,
+                description,
+                status,
+                github,
+                demo,
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+            
+            progressData.projects.push(project);
+            addProjectToDOM(project);
+            
+            // Clear form
+            document.getElementById('projectTitle').value = '';
+            document.getElementById('projectDescription').value = '';
+            document.getElementById('projectStatus').value = 'planned';
+            document.getElementById('projectGithub').value = '';
+            document.getElementById('projectDemo').value = '';
+            
+            updateProgress();
+        }
+
+        function addProjectToDOM(project) {
+            const projectsContainer = document.getElementById('projectsList');
+            
+            const projectCard = document.createElement('div');
+            projectCard.className = 'project-card';
+            projectCard.innerHTML = `
+                <div class="project-title">${project.title}</div>
+                <span class="project-status status-${project.status}">${project.status.replace('-', ' ')}</span>
+                <p style="margin: 10px 0; color: #666;">${project.description}</p>
+                <div style="margin-top: 15px;">
+                    ${project.github ? `<a href="${project.github}" target="_blank" style="margin-right: 15px; color: #3498db;">GitHub</a>` : ''}
+                    ${project.demo ? `<a href="${project.demo}" target="_blank" style="color: #27ae60;">Demo</a>` : ''}
+                    <button onclick="deleteProject(${project.id})" style="float: right; background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Delete</button>
+                </div>
+                <small style="color: #999;">Created: ${project.createdAt}</small>
+            `;
+            
+            projectsContainer.appendChild(projectCard);
+        }
+
+        function deleteProject(projectId) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                progressData.projects = progressData.projects.filter(p => p.id !== projectId);
+                
+                // Refresh projects display
+                document.getElementById('projectsList').innerHTML = '';
+                progressData.projects.forEach(project => {
+                    addProjectToDOM(project);
+                });
+                
+                updateProgress();
+            }
+        }
+
+        // Notes management
+        function saveNotes() {
+            progressData.notes = document.getElementById('learningNotes').value;
+            saveProgress();
+            alert('Notes saved successfully!');
+        }
+
+        // Export functionality
+        function exportProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            let completedCount = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) completedCount++;
+            });
+            
+            const report = `
+AI Engineering Progress Report
+Generated: ${new Date().toLocaleDateString()}
+Start Date: ${progressData.startDate}
+Study Days: ${progressData.studyDays.size}
+
+PROGRESS SUMMARY:
+- Topics Completed: ${completedCount}/${checkboxes.length} (${Math.round((completedCount/checkboxes.length)*100)}%)
+- Projects Built: ${progressData.projects.length}
+- Days Studied: ${progressData.studyDays.size}
+
+PROJECTS:
+${progressData.projects.map(p => `
+- ${p.title} (${p.status})
+  ${p.description}
+  ${p.github ? 'GitHub: ' + p.github : ''}
+  ${p.demo ? 'Demo: ' + p.demo : ''}
+`).join('\n')}
+
+NOTES:
+${progressData.notes}
+
+DETAILED PROGRESS:
+${Array.from(checkboxes).map((checkbox, index) => {
+    const label = checkbox.nextElementSibling.textContent;
+    return `${checkbox.checked ? '✅' : '❌'} ${label}`;
+}).join('\n')}
+            `;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AI_Progress_Report_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Enhanced data export/import functions
+        function exportData() {
+            const dataToExport = {
+                ...progressData,
+                studyDays: Array.from(progressData.studyDays),
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai_progress_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Data backup exported successfully! Save this file to restore your progress later.');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validate the data structure
+                    if (!importedData.topics && !importedData.projects) {
+                        throw new Error('Invalid backup file format');
+                    }
+                    
+                    // Merge with existing data or replace
+                    const shouldReplace = confirm('Do you want to REPLACE all current progress with the backup? Click Cancel to MERGE with current progress.');
+                    
+                    if (shouldReplace) {
+                        progressData = {
+                            startDate: importedData.startDate || new Date().toISOString().split('T')[0],
+                            topics: importedData.topics || {},
+                            projects: importedData.projects || [],
+                            notes: importedData.notes || '',
+                            studyDays: new Set(importedData.studyDays || [])
+                        };
+                    } else {
+                        // Merge data
+                        progressData.topics = { ...progressData.topics, ...importedData.topics };
+                        progressData.projects = [...progressData.projects, ...importedData.projects];
+                        progressData.notes = progressData.notes + '\n\n--- IMPORTED ---\n' + (importedData.notes || '');
+                        importedData.studyDays?.forEach(day => progressData.studyDays.add(day));
+                    }
+                    
+                    // Restore the UI
+                    document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                        checkbox.checked = progressData.topics[index] || false;
+                    });
+                    
+                    document.getElementById('learningNotes').value = progressData.notes;
+                    
+                    // Clear and restore projects
+                    document.getElementById('projectsList').innerHTML = '';
+                    progressData.projects.forEach(project => {
+                        addProjectToDOM(project);
+                    });
+                    
+                    updateProgress();
+                    alert('✅ Data imported successfully!');
+                    
+                } catch (error) {
+                    alert('❌ Error importing data: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // GitHub Gist sync functions
+        function syncToGitHub() {
+            const token = localStorage.getItem('githubToken');
+            if (!token) {
+                document.getElementById('githubSetup').style.display = 'block';
+                alert('Please set up your GitHub token first.');
+                return;
+            }
+            
+            const dataToSync = {
+                ...progressData,
+                studyDays: Array.from(progressData.studyDays),
+                lastSync: new Date().toISOString()
+            };
+            
+            const gistData = {
+                description: 'AI Engineering Progress Tracker - Auto Backup',
+                public: false,
+                files: {
+                    'ai_progress.json': {
+                        content: JSON.stringify(dataToSync, null, 2)
+                    }
+                }
+            };
+            
+            // Check if gist ID exists
+            const existingGistId = localStorage.getItem('progressGistId');
+            
+            const url = existingGistId 
+                ? `https://api.github.com/gists/${existingGistId}`
+                : 'https://api.github.com/gists';
+            
+            const method = existingGistId ? 'PATCH' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(gistData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    localStorage.setItem('progressGistId', data.id);
+                    localStorage.setItem('lastSyncTime', new Date().toISOString());
+                    alert('✅ Progress synced to GitHub Gist successfully!');
+                } else {
+                    throw new Error(data.message || 'Sync failed');
+                }
+            })
+            .catch(error => {
+                alert('❌ Sync failed: ' + error.message + '\nCheck your GitHub token and internet connection.');
+            });
+        }
+
+        function loadFromGitHub() {
+            const token = localStorage.getItem('githubToken');
+            const gistId = localStorage.getItem('progressGistId');
+            
+            if (!token || !gistId) {
+                alert('No GitHub backup found. Please sync your data first.');
+                return;
+            }
+            
+            fetch(`https://api.github.com/gists/${gistId}`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const fileContent = data.files['ai_progress.json'].content;
+                const cloudData = JSON.parse(fileContent);
+                
+                const shouldReplace = confirm('Load progress from GitHub? This will replace your current progress.');
+                if (!shouldReplace) return;
+                
+                progressData = {
+                    startDate: cloudData.startDate || new Date().toISOString().split('T')[0],
+                    topics: cloudData.topics || {},
+                    projects: cloudData.projects || [],
+                    notes: cloudData.notes || '',
+                    studyDays: new Set(cloudData.studyDays || [])
+                };
+                
+                // Restore the UI
+                document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                    checkbox.checked = progressData.topics[index] || false;
+                });
+                
+                document.getElementById('learningNotes').value = progressData.notes;
+                
+                // Clear and restore projects
+                document.getElementById('projectsList').innerHTML = '';
+                progressData.projects.forEach(project => {
+                    addProjectToDOM(project);
+                });
+                
+                updateProgress();
+                alert('✅ Progress loaded from GitHub successfully!');
+            })
+            .catch(error => {
+                alert('❌ Failed to load from GitHub: ' + error.message);
+            });
+        }
+
+        function saveGitHubToken() {
+            const token = document.getElementById('githubToken').value.trim();
+            if (token) {
+                localStorage.setItem('githubToken', token);
+                document.getElementById('githubSetup').style.display = 'none';
+                alert('✅ GitHub token saved! You can now sync your progress to the cloud.');
+            } else {
+                alert('Please enter a valid GitHub token.');
+            }
+        }
+
+        // Auto-sync every 5 minutes if GitHub is set up
+        setInterval(() => {
+            const token = localStorage.getItem('githubToken');
+            const gistId = localStorage.getItem('progressGistId');
+            if (token && gistId) {
+                syncToGitHub();
+            }
+        }, 5 * 60 * 1000); // 5 minutes
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            
+            // Set up auto-save for notes
+            document.getElementById('learningNotes').addEventListener('input', function() {
+                progressData.notes = this.value;
+                saveProgress();
+            });
+        });
+    </script>
+</body>
+</html>
